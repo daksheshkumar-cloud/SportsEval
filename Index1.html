@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SportEval — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --neon: #00f5ff;
+  --neon2: #00c8ff;
+  --fire: #ff4d00;
+  --gold: #ffd700;
+  --green: #00ff88;
+  --purple: #a855f7;
+  --dark: #060b14;
+  --darker: #030508;
+  --card: #0b1628;
+  --card2: #0f1e30;
+  --border: rgba(0,245,255,0.12);
+  --border2: rgba(0,245,255,0.22);
+  --text: #b8ccd8;
+  --white: #f0f8ff;
+  --sidebar-w: 240px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--dark); color:var(--text); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+
+/* ─── BACKGROUND ─── */
+.bg-grid {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: linear-gradient(rgba(0,245,255,0.025) 1px, transparent 1px),
+                    linear-gradient(90deg,rgba(0,245,255,0.025) 1px,transparent 1px);
+  background-size:50px 50px;
+}
+.bg-orb { position:fixed; border-radius:50%; filter:blur(140px); pointer-events:none; z-index:0; }
+.orb1 { width:500px;height:500px; background:rgba(0,245,255,0.07); top:-150px;right:-150px; }
+.orb2 { width:400px;height:400px; background:rgba(255,77,0,0.05); bottom:-100px;left:-100px; }
+.orb3 { width:300px;height:300px; background:rgba(168,85,247,0.05); top:40%;left:30%; }
+
+/* ─── LOGIN PAGE ─── */
+#login-page {
+  position:fixed; inset:0; z-index:200;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--darker);
+  transition:opacity 0.6s, transform 0.6s;
+}
+#login-page.hide { opacity:0; pointer-events:none; transform:scale(1.04); }
+
+.login-wrap {
+  display:grid; grid-template-columns:1fr 1fr;
+  width:min(900px,95vw); min-height:540px;
+  background:var(--card);
+  border:1px solid var(--border2);
+  overflow:hidden;
+  box-shadow:0 40px 120px rgba(0,0,0,0.6), 0 0 60px rgba(0,245,255,0.06);
+}
+
+/* Left panel */
+.login-left {
+  background: linear-gradient(145deg, #020d1a 0%, #061628 50%, #030a14 100%);
+  padding:50px 40px;
+  display:flex; flex-direction:column; justify-content:center;
+  position:relative; overflow:hidden;
+  border-right:1px solid var(--border);
+}
+.login-left::before {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse at 30% 40%, rgba(0,245,255,0.1) 0%, transparent 60%);
+}
+.ll-logo { font-family:'Bebas Neue'; font-size:38px; letter-spacing:4px; color:var(--white); position:relative; }
+.ll-logo span { color:var(--neon); }
+.ll-tag { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:rgba(0,245,255,0.5); margin-top:4px; position:relative; }
+.ll-title { font-family:'Bebas Neue'; font-size:44px; letter-spacing:2px; color:var(--white); line-height:1.05; margin:36px 0 16px; position:relative; }
+.ll-title .hl { color:var(--neon); display:block; }
+.ll-desc { font-size:14px; color:rgba(184,204,216,0.6); line-height:1.8; position:relative; max-width:280px; }
+
+.ll-stats { display:flex; gap:28px; margin-top:40px; position:relative; }
+.ll-stat { }
+.ll-stat .n { font-family:'Bebas Neue'; font-size:32px; color:var(--white); line-height:1; }
+.ll-stat .n span { color:var(--neon); }
+.ll-stat .l { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(184,204,216,0.4); }
+
+.ll-orb { position:absolute; bottom:-80px; right:-80px; width:250px;height:250px; border-radius:50%; background:radial-gradient(circle,rgba(0,245,255,0.1),transparent 70%); }
+
+/* Right panel — form */
+.login-right {
+  padding:50px 44px;
+  display:flex; flex-direction:column; justify-content:center;
+}
+.lr-head { margin-bottom:34px; }
+.lr-head h2 { font-family:'Bebas Neue'; font-size:32px; letter-spacing:2px; color:var(--white); }
+.lr-head p { font-size:14px; color:rgba(184,204,216,0.5); margin-top:4px; }
+
+.role-tabs { display:flex; gap:8px; margin-bottom:28px; }
+.role-tab {
+  flex:1; padding:9px; text-align:center; font-family:'Rajdhani'; font-size:13px;
+  font-weight:600; letter-spacing:2px; text-transform:uppercase;
+  background:transparent; border:1px solid var(--border); color:rgba(184,204,216,0.5);
+  cursor:pointer; transition:all 0.25s;
+}
+.role-tab.active { background:rgba(0,245,255,0.1); border-color:var(--neon); color:var(--neon); }
+
+.inp-group { margin-bottom:18px; }
+.inp-label { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(0,245,255,0.6); margin-bottom:7px; display:block; }
+.inp-wrap { position:relative; }
+.inp-wrap .inp-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none; }
+.login-input {
+  width:100%; padding:13px 14px 13px 42px;
+  background:rgba(0,245,255,0.03); border:1px solid var(--border);
+  color:var(--white); font-family:'Rajdhani'; font-size:15px;
+  outline:none; transition:border-color 0.3s, background 0.3s;
+}
+.login-input:focus { border-color:rgba(0,245,255,0.5); background:rgba(0,245,255,0.05); }
+.login-input::placeholder { color:rgba(184,204,216,0.25); }
+
+.login-extras { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; font-size:13px; }
+.remember { display:flex; align-items:center; gap:8px; cursor:pointer; color:rgba(184,204,216,0.6); }
+.remember input { accent-color:var(--neon); }
+.forgot { color:rgba(0,245,255,0.6); text-decoration:none; transition:color 0.2s; }
+.forgot:hover { color:var(--neon); }
+
+.login-btn {
+  width:100%; padding:15px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  color:var(--dark); font-family:'Rajdhani'; font-weight:700;
+  font-size:15px; letter-spacing:3px; text-transform:uppercase;
+  border:none; cursor:pointer;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);
+  transition:transform 0.2s, box-shadow 0.3s;
+  position:relative; overflow:hidden;
+}
+.login-btn::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent);
+  opacity:0; transition:opacity 0.2s;
+}
+.login-btn:hover { transform:translateY(-2px); box-shadow:0 10px 40px rgba(0,245,255,0.4); }
+.login-btn:hover::after { opacity:1; }
+.login-btn:active { transform:translateY(0); }
+
+.login-err { color:var(--fire); font-size:13px; letter-spacing:1px; margin-top:10px; display:none; }
+.demo-hint { margin-top:18px; padding:12px 16px; background:rgba(0,245,255,0.04); border:1px solid var(--border); font-size:12px; color:rgba(184,204,216,0.5); line-height:1.7; }
+.demo-hint strong { color:var(--neon); font-family:'JetBrains Mono'; }
+
+/* ─── MAIN APP ─── */
+#app { display:none; min-height:100vh; }
+#app.show { display:flex; }
+
+/* Sidebar */
+.sidebar {
+  width:var(--sidebar-w); min-height:100vh;
+  background:var(--darker); border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  position:fixed; left:0; top:0; bottom:0; z-index:50;
+  transition:transform 0.3s;
+}
+.sb-logo { padding:28px 24px 24px; border-bottom:1px solid var(--border); }
+.sb-logo .name { font-family:'Bebas Neue'; font-size:26px; letter-spacing:3px; color:var(--white); }
+.sb-logo .name span { color:var(--neon); }
+.sb-logo .role-badge {
+  display:inline-block; margin-top:6px;
+  background:rgba(0,245,255,0.1); border:1px solid rgba(0,245,255,0.2);
+  padding:2px 10px; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--neon);
+}
+
+.sb-nav { flex:1; padding:20px 0; overflow-y:auto; }
+.sb-section-lbl { font-size:9px; letter-spacing:4px; text-transform:uppercase; color:rgba(184,204,216,0.3); padding:16px 24px 6px; }
+.nav-item {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 24px; cursor:pointer;
+  color:rgba(184,204,216,0.55); font-size:14px; font-weight:600; letter-spacing:1px;
+  transition:all 0.2s; border-left:3px solid transparent;
+  position:relative;
+}
+.nav-item:hover { color:var(--white); background:rgba(0,245,255,0.04); }
+.nav-item.active { color:var(--neon); background:rgba(0,245,255,0.07); border-left-color:var(--neon); }
+.nav-item .ni-icon { font-size:18px; width:22px; text-align:center; }
+.nav-item .ni-badge {
+  margin-left:auto; background:var(--fire);
+  color:var(--white); font-size:10px; font-weight:700; font-family:'JetBrains Mono';
+  padding:1px 7px; border-radius:10px;
+}
+
+.sb-user { padding:18px 24px; border-top:1px solid var(--border); }
+.sb-user-info { display:flex; align-items:center; gap:10px; }
+.sb-avatar {
+  width:38px; height:38px; border-radius:50%;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue'; font-size:18px; color:var(--dark); flex-shrink:0;
+}
+.sb-uname { font-weight:700; font-size:14px; color:var(--white); }
+.sb-urole { font-size:11px; color:rgba(184,204,216,0.4); letter-spacing:1px; }
+.sb-logout {
+  margin-top:10px; width:100%; padding:8px;
+  background:transparent; border:1px solid rgba(255,77,0,0.3);
+  color:rgba(255,77,0,0.7); font-family:'Rajdhani'; font-size:12px; font-weight:600;
+  letter-spacing:2px; text-transform:uppercase; cursor:pointer;
+  transition:all 0.2s;
+}
+.sb-logout:hover { background:rgba(255,77,0,0.1); border-color:var(--fire); color:var(--fire); }
+
+/* Main Content */
+.main-content {
+  margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh;
+}
+
+/* Top Bar */
+.topbar {
+  padding:16px 32px; background:rgba(6,11,20,0.9); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:40;
+}
+.topbar-title { font-family:'Bebas Neue'; font-size:24px; letter-spacing:3px; color:var(--white); }
+.topbar-right { display:flex; align-items:center; gap:20px; }
+.tb-search {
+  background:rgba(0,245,255,0.04); border:1px solid var(--border);
+  padding:8px 16px 8px 38px; color:var(--white);
+  font-family:'Rajdhani'; font-size:14px; outline:none; width:200px;
+  transition:border-color 0.3s; position:relative;
+}
+.tb-search:focus { border-color:rgba(0,245,255,0.4); }
+.tb-search::placeholder { color:rgba(184,204,216,0.3); }
+.search-wrap { position:relative; }
+.search-wrap::before { content:'🔍'; position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:13px; pointer-events:none; }
+.tb-notif {
+  position:relative; width:36px; height:36px; border-radius:50%;
+  background:rgba(0,245,255,0.06); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
+  transition:border-color 0.2s;
+}
+.tb-notif:hover { border-color:var(--neon); }
+.tb-notif .badge {
+  position:absolute; top:-2px; right:-2px; width:14px; height:14px; border-radius:50%;
+  background:var(--fire); font-size:8px; color:var(--white);
+  display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono'; font-weight:700;
+}
+.live-pill {
+  display:flex; align-items:center; gap:6px;
+  background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.25);
+  padding:5px 12px; font-size:11px; letter-spacing:2px; color:var(--green);
+}
+.live-dot2 { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse 1.2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* Pages */
+.page { display:none; padding:28px 32px; animation:fadeIn 0.4s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── OVERVIEW PAGE ─── */
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:24px; }
+.kpi-card {
+  background:var(--card); border:1px solid var(--border);
+  padding:22px 24px; position:relative; overflow:hidden;
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);
+  transition:transform 0.25s, border-color 0.25s;
+}
+.kpi-card:hover { transform:translateY(-4px); border-color:var(--border2); }
+.kpi-card::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.kpi-card.cyan::after { background:linear-gradient(90deg,var(--neon),transparent); }
+.kpi-card.fire::after { background:linear-gradient(90deg,var(--fire),transparent); }
+.kpi-card.gold::after { background:linear-gradient(90deg,var(--gold),transparent); }
+.kpi-card.green::after { background:linear-gradient(90deg,var(--green),transparent); }
+.kpi-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(184,204,216,0.45); margin-bottom:10px; }
+.kpi-val { font-family:'Bebas Neue'; font-size:42px; letter-spacing:2px; line-height:1; color:var(--white); }
+.kpi-val.cyan { color:var(--neon); }
+.kpi-val.fire { color:var(--fire); }
+.kpi-val.gold { color:var(--gold); }
+.kpi-val.green { color:var(--green); }
+.kpi-change { font-size:12px; margin-top:8px; }
+.kpi-change.up { color:var(--green); }
+.kpi-change.dn { color:var(--fire); }
+.kpi-icon { position:absolute; right:18px; top:18px; font-size:28px; opacity:0.18; }
+
+.dash-row { display:grid; gap:18px; margin-bottom:18px; }
+.dash-row.r2 { grid-template-columns:1.6fr 1fr; }
+.dash-row.r3 { grid-template-columns:1fr 1fr 1fr; }
+
+.panel {
+  background:var(--card); border:1px solid var(--border);
+  padding:24px; transition:border-color 0.25s;
+}
+.panel:hover { border-color:var(--border2); }
+.panel-head {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px;
+}
+.panel-title { font-family:'JetBrains Mono'; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(0,245,255,0.65); display:flex; align-items:center; gap:7px; }
+.panel-action { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(0,245,255,0.45); cursor:pointer; transition:color 0.2s; }
+.panel-action:hover { color:var(--neon); }
+
+/* Chart */
+.chart-area { height:140px; display:flex; align-items:flex-end; gap:8px; }
+.c-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; }
+.c-bar {
+  width:100%; border-radius:2px 2px 0 0; min-height:4px;
+  background:linear-gradient(180deg,var(--neon),rgba(0,245,255,0.2));
+  transition:height 1.2s cubic-bezier(.23,1,.32,1);
+}
+.c-bar.b-fire { background:linear-gradient(180deg,var(--fire),rgba(255,77,0,0.2)); }
+.c-bar.b-gold { background:linear-gradient(180deg,var(--gold),rgba(255,215,0,0.2)); }
+.c-bar.b-green { background:linear-gradient(180deg,var(--green),rgba(0,255,136,0.2)); }
+.c-lbl { font-size:9px; font-family:'JetBrains Mono'; color:rgba(184,204,216,0.35); }
+
+/* Line chart fake */
+.line-chart { height:120px; position:relative; overflow:hidden; }
+.line-chart svg { width:100%; height:100%; }
+
+/* Player table */
+.ptable { width:100%; border-collapse:collapse; }
+.ptable th { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:rgba(0,245,255,0.5); text-align:left; padding:0 0 12px; border-bottom:1px solid var(--border); font-family:'JetBrains Mono'; font-weight:400; }
+.ptable td { padding:11px 0; border-bottom:1px solid rgba(0,245,255,0.05); font-size:14px; vertical-align:middle; }
+.ptable tr:last-child td { border-bottom:none; }
+.ptable tr:hover td { background:rgba(0,245,255,0.025); }
+.p-av { width:32px;height:32px; border-radius:50%; display:flex;align-items:center;justify-content:center; font-family:'Bebas Neue'; font-size:14px; color:var(--dark); }
+.p-nm { font-weight:700; color:var(--white); font-size:14px; }
+.p-pos-lbl { font-size:10px; color:rgba(184,204,216,0.4); letter-spacing:1px; }
+.score-pill { display:inline-block; padding:3px 10px; font-family:'JetBrains Mono'; font-size:13px; font-weight:700; }
+.score-pill.s-hi { background:rgba(0,255,136,0.12); color:var(--green); }
+.score-pill.s-md { background:rgba(255,215,0,0.12); color:var(--gold); }
+.score-pill.s-lo { background:rgba(255,77,0,0.12); color:var(--fire); }
+.risk-bar-wrap { display:flex; align-items:center; gap:8px; }
+.risk-bar { height:4px; width:80px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
+.risk-fill { height:100%; border-radius:2px; }
+
+/* Radial stat */
+.radial-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.radial-wrap svg circle { transition:stroke-dashoffset 1.4s cubic-bezier(.23,1,.32,1); }
+.radial-val { font-family:'Bebas Neue'; font-size:28px; color:var(--white); line-height:1; }
+.radial-lbl { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(184,204,216,0.4); }
+
+/* Activity feed */
+.af-item { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid rgba(0,245,255,0.05); }
+.af-item:last-child { border-bottom:none; }
+.af-dot { width:8px;height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.af-content { flex:1; }
+.af-text { font-size:13px; color:var(--text); line-height:1.4; }
+.af-time { font-size:10px; color:rgba(184,204,216,0.3); font-family:'JetBrains Mono'; margin-top:3px; letter-spacing:1px; }
+
+/* ─── ATHLETES PAGE ─── */
+.athletes-filters { display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
+.filter-btn {
+  padding:7px 18px; background:transparent; border:1px solid var(--border);
+  color:rgba(184,204,216,0.55); font-family:'Rajdhani'; font-size:13px;
+  font-weight:600; letter-spacing:1px; text-transform:uppercase; cursor:pointer;
+  transition:all 0.2s;
+}
+.filter-btn.active, .filter-btn:hover { background:rgba(0,245,255,0.08); border-color:var(--neon); color:var(--neon); }
+
+.athletes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:20px; }
+.athlete-card {
+  background:var(--card); border:1px solid var(--border);
+  padding:24px; position:relative;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,0 100%);
+  cursor:pointer; transition:all 0.3s;
+}
+.athlete-card:hover { transform:translateY(-5px); border-color:var(--border2); box-shadow:0 16px 40px rgba(0,0,0,0.3); }
+.ac-header { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+.ac-av { width:48px;height:48px; border-radius:50%; display:flex;align-items:center;justify-content:center; font-family:'Bebas Neue'; font-size:22px; color:var(--dark); flex-shrink:0; }
+.ac-name { font-weight:700; font-size:16px; color:var(--white); }
+.ac-pos { font-size:11px; color:rgba(184,204,216,0.4); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+.ac-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px; }
+.ac-stat { text-align:center; }
+.ac-stat .v { font-family:'Bebas Neue'; font-size:22px; color:var(--white); line-height:1; }
+.ac-stat .l { font-size:9px; letter-spacing:2px; color:rgba(184,204,216,0.35); text-transform:uppercase; }
+.ac-score-bar { height:3px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
+.ac-score-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--neon),var(--neon2)); }
+.ac-risk-tag { position:absolute; top:14px; right:14px; font-size:9px; letter-spacing:2px; text-transform:uppercase; padding:2px 8px; }
+.ac-risk-tag.low { background:rgba(0,255,136,0.12); color:var(--green); }
+.ac-risk-tag.med { background:rgba(255,215,0,0.12); color:var(--gold); }
+.ac-risk-tag.hi { background:rgba(255,77,0,0.12); color:var(--fire); }
+
+/* ─── ANALYTICS PAGE ─── */
+.analytics-kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:24px; }
+.a-kpi { background:var(--card); border:1px solid var(--border); padding:24px; }
+.a-kpi-val { font-family:'Bebas Neue'; font-size:48px; line-height:1; }
+.a-kpi-lbl { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(184,204,216,0.4); margin-top:4px; }
+.a-kpi-trend { margin-top:8px; font-size:12px; }
+.big-chart { height:180px; background:rgba(0,245,255,0.02); border:1px solid var(--border); position:relative; overflow:hidden; margin-bottom:18px; }
+.big-chart svg { width:100%; height:100%; }
+.heatmap-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.hm-cell {
+  aspect-ratio:1; border-radius:2px;
+  transition:transform 0.2s;
+  cursor:pointer;
+}
+.hm-cell:hover { transform:scale(1.2); }
+
+/* ─── SETTINGS PAGE ─── */
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.settings-card { background:var(--card); border:1px solid var(--border); padding:28px; }
+.sc-title { font-family:'Bebas Neue'; font-size:20px; letter-spacing:2px; color:var(--white); margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+.setting-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(0,245,255,0.04); }
+.setting-row:last-child { border-bottom:none; }
+.sr-label { font-size:14px; color:var(--text); font-weight:600; }
+.sr-sub { font-size:11px; color:rgba(184,204,216,0.4); margin-top:2px; }
+.toggle { width:44px; height:24px; background:rgba(255,255,255,0.1); border-radius:12px; position:relative; cursor:pointer; transition:background 0.3s; }
+.toggle.on { background:rgba(0,245,255,0.3); }
+.toggle::after { content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:rgba(184,204,216,0.5); transition:transform 0.3s, background 0.3s; }
+.toggle.on::after { transform:translateX(20px); background:var(--neon); }
+.profile-form .inp-group { margin-bottom:16px; }
+.profile-form .login-input { padding:11px 14px; }
+.save-btn {
+  padding:11px 30px; background:linear-gradient(135deg,var(--neon),var(--neon2));
+  color:var(--dark); font-family:'Rajdhani'; font-weight:700; font-size:14px; letter-spacing:2px;
+  border:none; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+}
+.save-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,245,255,0.35); }
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .sidebar { transform:translateX(-100%); }
+  .main-content { margin-left:0; }
+  .kpi-row { grid-template-columns:1fr 1fr; }
+  .dash-row.r2, .dash-row.r3 { grid-template-columns:1fr; }
+  .settings-grid { grid-template-columns:1fr; }
+  .login-wrap { grid-template-columns:1fr; }
+  .login-left { display:none; }
+  .analytics-kpis { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:560px){
+  .kpi-row { grid-template-columns:1fr 1fr; }
+  .athletes-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
+
+<!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+<div id="login-page">
+  <div class="login-wrap">
+    <!-- Left -->
+    <div class="login-left">
+      <div class="ll-logo">SPORT<span>S</span>PULSE</div>
+      <div class="ll-tag">// Tracking & Training System</div>
+      <div class="ll-title">
+        Athlete
+        <span class="hl">Intelligence</span>
+        Platform
+      </div>
+      <div class="ll-desc">Real-time sensor data, machine learning insights, and cloud-native architecture built for elite sports performance.</div>
+      <div class="ll-stats">
+        <div class="ll-stat"><div class="n">98<span>%</span></div><div class="l">Accuracy</div></div>
+        <div class="ll-stat"><div class="n">50<span>ms</span></div><div class="l">Latency</div></div>
+        <div class="ll-stat"><div class="n">24<span>/7</span></div><div class="l">Uptime</div></div>
+      </div>
+      <div class="ll-orb"></div>
+    </div>
+    <!-- Right -->
+    <div class="login-right">
+      <div class="lr-head">
+        <h2>WELCOME BACK</h2>
+        <p>Sign in to access your dashboard</p>
+      </div>
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="setRole('Coach')">🏆 Coach</button>
+        <button class="role-tab" onclick="setRole('Analyst')">📊 Analyst</button>
+        <button class="role-tab" onclick="setRole('Athlete')">🏃 Athlete</button>
+      </div>
+      <div class="inp-group">
+        <label class="inp-label">Username</label>
+        <div class="inp-wrap">
+          <span class="inp-icon">👤</span>
+          <input class="login-input" type="text" id="l-user" placeholder="Enter your username" autocomplete="username">
+        </div>
+      </div>
+      <div class="inp-group">
+        <label class="inp-label">Password</label>
+        <div class="inp-wrap">
+          <span class="inp-icon">🔒</span>
+          <input class="login-input" type="password" id="l-pass" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+      </div>
+      <div class="login-extras">
+        <label class="remember"><input type="checkbox" checked> Remember me</label>
+        <a href="#" class="forgot">Forgot password?</a>
+      </div>
+      <button class="login-btn" onclick="doLogin()">SIGN IN →</button>
+      <div class="login-err" id="login-err">⚠ Invalid credentials. Check the demo hint below.</div>
+      <div class="demo-hint">
+        Demo credentials: <br>
+        Username: <strong>coach</strong> &nbsp;|&nbsp; Password: <strong>pulse123</strong><br>
+        Username: <strong>analyst</strong> &nbsp;|&nbsp; Password: <strong>pulse123</strong><br>
+        Username: <strong>athlete</strong> &nbsp;|&nbsp; Password: <strong>pulse123</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="name">SPORT<span>S</span>PULSE</div>
+      <div class="role-badge" id="sb-role">Coach</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section-lbl">Main</div>
+      <div class="nav-item active" onclick="switchPage('overview',this)"><span class="ni-icon">🏠</span> Overview</div>
+      <div class="nav-item" onclick="switchPage('athletes',this)"><span class="ni-icon">🏃</span> Athletes <span class="ni-badge">14</span></div>
+      <div class="nav-item" onclick="switchPage('analytics',this)"><span class="ni-icon">📊</span> Analytics</div>
+      <div class="sb-section-lbl">Management</div>
+      <div class="nav-item" onclick="switchPage('training',this)"><span class="ni-icon">⚡</span> Training</div>
+      <div class="nav-item" onclick="switchPage('injuries',this)"><span class="ni-icon">❤️</span> Injury Monitor <span class="ni-badge" style="background:var(--gold);color:var(--dark);">3</span></div>
+      <div class="sb-section-lbl">System</div>
+      <div class="nav-item" onclick="switchPage('settings',this)"><span class="ni-icon">⚙️</span> Settings</div>
+    </nav>
+    <div class="sb-user">
+      <div class="sb-user-info">
+        <div class="sb-avatar" id="sb-av">C</div>
+        <div>
+          <div class="sb-uname" id="sb-name">Coach</div>
+          <div class="sb-urole" id="sb-role2">Head Coach</div>
+        </div>
+      </div>
+      <button class="sb-logout" onclick="doLogout()">⏻ Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">OVERVIEW</div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <input class="tb-search" type="text" placeholder="Search athletes...">
+        </div>
+        <div class="live-pill"><span class="live-dot2"></span> LIVE</div>
+        <div class="tb-notif">🔔<span class="badge">3</span></div>
+        <div style="font-size:12px;letter-spacing:2px;color:rgba(184,204,216,0.4);font-family:'JetBrains Mono'" id="clock">--:--</div>
+      </div>
+    </div>
+
+    <!-- ── OVERVIEW ── -->
+    <div class="page active" id="page-overview">
+      <div class="kpi-row">
+        <div class="kpi-card cyan">
+          <div class="kpi-icon">💓</div>
+          <div class="kpi-label">Avg Heart Rate</div>
+          <div class="kpi-val cyan" id="k1">142</div>
+          <div class="kpi-change up">▲ 4 bpm from yesterday</div>
+        </div>
+        <div class="kpi-card fire">
+          <div class="kpi-icon">⚡</div>
+          <div class="kpi-label">Peak Speed (km/h)</div>
+          <div class="kpi-val fire" id="k2">31.2</div>
+          <div class="kpi-change up">▲ 1.3 km/h this week</div>
+        </div>
+        <div class="kpi-card gold">
+          <div class="kpi-icon">🏅</div>
+          <div class="kpi-label">Active Athletes</div>
+          <div class="kpi-val gold">14</div>
+          <div class="kpi-change dn">▼ 2 on rest today</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-icon">✅</div>
+          <div class="kpi-label">Session Score</div>
+          <div class="kpi-val green" id="k4">87%</div>
+          <div class="kpi-change up">▲ 5% vs last session</div>
+        </div>
+      </div>
+
+      <div class="dash-row r2">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title"><span class="live-dot2"></span> PERFORMANCE INTENSITY — 7 SESSIONS</div>
+            <div class="panel-action">Export</div>
+          </div>
+          <div class="chart-area" id="main-chart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">TEAM FITNESS SCORE</div>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div class="radial-wrap">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(0,245,255,0.08)" stroke-width="8"/>
+                <circle cx="45" cy="45" r="36" fill="none" stroke="var(--neon)" stroke-width="8"
+                  stroke-dasharray="226" stroke-dashoffset="40" stroke-linecap="round"
+                  transform="rotate(-90 45 45)"/>
+              </svg>
+              <div class="radial-val">82%</div>
+              <div class="radial-lbl">Endurance</div>
+            </div>
+            <div class="radial-wrap">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,77,0,0.08)" stroke-width="8"/>
+                <circle cx="45" cy="45" r="36" fill="none" stroke="var(--fire)" stroke-width="8"
+                  stroke-dasharray="226" stroke-dashoffset="68" stroke-linecap="round"
+                  transform="rotate(-90 45 45)"/>
+              </svg>
+              <div class="radial-val">70%</div>
+              <div class="radial-lbl">Strength</div>
+            </div>
+            <div class="radial-wrap">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(0,255,136,0.08)" stroke-width="8"/>
+                <circle cx="45" cy="45" r="36" fill="none" stroke="var(--green)" stroke-width="8"
+                  stroke-dasharray="226" stroke-dashoffset="22" stroke-linecap="round"
+                  transform="rotate(-90 45 45)"/>
+              </svg>
+              <div class="radial-val">90%</div>
+              <div class="radial-lbl">Recovery</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-row r2">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">TOP PERFORMERS — TODAY</div>
+            <div class="panel-action">View All →</div>
+          </div>
+          <table class="ptable">
+            <thead><tr>
+              <th>ATHLETE</th><th>POS</th><th>SCORE</th><th>SPEED</th><th>INJURY RISK</th>
+            </tr></thead>
+            <tbody id="top-table"></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">LIVE ACTIVITY FEED</div>
+            <div class="live-dot2"></div>
+          </div>
+          <div id="activity-feed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ATHLETES ── -->
+    <div class="page" id="page-athletes">
+      <div class="athletes-filters">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Forward</button>
+        <button class="filter-btn">Midfielder</button>
+        <button class="filter-btn">Defender</button>
+        <button class="filter-btn">Goalkeeper</button>
+      </div>
+      <div class="athletes-grid" id="athletes-grid"></div>
+    </div>
+
+    <!-- ── ANALYTICS ── -->
+    <div class="page" id="page-analytics">
+      <div class="analytics-kpis">
+        <div class="a-kpi"><div class="a-kpi-val" style="color:var(--neon)">98.3%</div><div class="a-kpi-lbl">Tracking Accuracy</div><div class="a-kpi-trend" style="color:var(--green)">▲ +0.4% this week</div></div>
+        <div class="a-kpi"><div class="a-kpi-val" style="color:var(--fire)">2.1M</div><div class="a-kpi-lbl">Data Points Today</div><div class="a-kpi-trend" style="color:var(--green)">▲ +120K vs avg</div></div>
+        <div class="a-kpi"><div class="a-kpi-val" style="color:var(--gold)">47ms</div><div class="a-kpi-lbl">Avg Latency</div><div class="a-kpi-trend" style="color:var(--green)">▼ 3ms improved</div></div>
+      </div>
+      <div class="dash-row r2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">SPEED DISTRIBUTION — WEEK</div></div>
+          <div class="chart-area" id="analytics-chart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">TRAINING LOAD HEATMAP</div></div>
+          <div style="margin-bottom:10px;font-size:11px;letter-spacing:2px;color:rgba(184,204,216,0.35);display:flex;justify-content:space-between;">
+            <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span>
+          </div>
+          <div class="heatmap-grid" id="heatmap"></div>
+        </div>
+      </div>
+      <div class="dash-row r3">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">SHOOT ACCURACY</div></div>
+          <div style="text-align:center;padding:20px 0;">
+            <div style="font-family:'Bebas Neue';font-size:64px;color:var(--neon);line-height:1">87%</div>
+            <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(184,204,216,0.4);margin-top:8px">Team Average</div>
+            <div style="margin-top:16px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">
+              <div style="width:87%;height:100%;background:linear-gradient(90deg,var(--neon),var(--neon2));border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">DEFENSIVE COVERAGE</div></div>
+          <div style="text-align:center;padding:20px 0;">
+            <div style="font-family:'Bebas Neue';font-size:64px;color:var(--gold);line-height:1">74%</div>
+            <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(184,204,216,0.4);margin-top:8px">Field Coverage</div>
+            <div style="margin-top:16px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">
+              <div style="width:74%;height:100%;background:linear-gradient(90deg,var(--gold),rgba(255,215,0,0.3));border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">FATIGUE INDEX</div></div>
+          <div style="text-align:center;padding:20px 0;">
+            <div style="font-family:'Bebas Neue';font-size:64px;color:var(--fire);line-height:1">38%</div>
+            <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(184,204,216,0.4);margin-top:8px">Team Fatigue</div>
+            <div style="margin-top:16px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">
+              <div style="width:38%;height:100%;background:linear-gradient(90deg,var(--fire),rgba(255,77,0,0.3));border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRAINING ── -->
+    <div class="page" id="page-training">
+      <div class="dash-row r2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">WEEKLY TRAINING PLAN</div></div>
+          <div id="training-plan"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">SESSION COMPLETION</div></div>
+          <div id="training-completion"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── INJURY MONITOR ── -->
+    <div class="page" id="page-injuries">
+      <div class="kpi-row">
+        <div class="kpi-card green"><div class="kpi-icon">✅</div><div class="kpi-label">Low Risk</div><div class="kpi-val green">9</div></div>
+        <div class="kpi-card gold"><div class="kpi-icon">⚠️</div><div class="kpi-label">Medium Risk</div><div class="kpi-val gold">3</div></div>
+        <div class="kpi-card fire"><div class="kpi-icon">🚨</div><div class="kpi-label">High Risk</div><div class="kpi-val fire">2</div></div>
+        <div class="kpi-card cyan"><div class="kpi-icon">🏥</div><div class="kpi-label">On Rest</div><div class="kpi-val cyan">2</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">INJURY RISK MONITOR — ALL ATHLETES</div></div>
+        <div id="injury-table"></div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="page" id="page-settings">
+      <div class="settings-grid">
+        <div class="settings-card">
+          <div class="sc-title">Profile Settings</div>
+          <div class="profile-form">
+            <div class="inp-group"><label class="inp-label">Full Name</label><input class="login-input" type="text" id="s-name" value="Coach Dakshesh"></div>
+            <div class="inp-group"><label class="inp-label">Email</label><input class="login-input" type="email" value="dakshesh@SportEval.io"></div>
+            <div class="inp-group"><label class="inp-label">Role</label><input class="login-input" type="text" value="Head Coach" readonly style="opacity:0.5;cursor:not-allowed"></div>
+            <button class="save-btn" onclick="saveProfile()">SAVE CHANGES</button>
+            <div id="save-ok" style="display:none;margin-top:12px;color:var(--green);font-size:13px;font-family:'JetBrains Mono';letter-spacing:2px">✓ PROFILE SAVED</div>
+          </div>
+        </div>
+        <div class="settings-card">
+          <div class="sc-title">Notification Settings</div>
+          <div class="setting-row"><div><div class="sr-label">Live Alerts</div><div class="sr-sub">Real-time injury & fatigue alerts</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div><div class="sr-label">Session Reports</div><div class="sr-sub">Auto-generate after each session</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div><div class="sr-label">Email Digest</div><div class="sr-sub">Daily performance summary</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div><div class="sr-label">Push Notifications</div><div class="sr-sub">Mobile app alerts</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+        <div class="settings-card">
+          <div class="sc-title">Sensor Configuration</div>
+          <div class="setting-row"><div><div class="sr-label">GPS Tracking</div><div class="sr-sub">5Hz position update rate</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div><div class="sr-label">Heart Rate Monitor</div><div class="sr-sub">Continuous BPM tracking</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div><div class="sr-label">Accelerometer</div><div class="sr-sub">Impact & motion detection</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div><div class="sr-label">Computer Vision</div><div class="sr-sub">Camera-based tracking</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+        <div class="settings-card">
+          <div class="sc-title">System Settings</div>
+          <div class="setting-row"><div><div class="sr-label">Dark Mode</div><div class="sr-sub">Always-on dark interface</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div><div class="sr-label">Auto-Export Reports</div><div class="sr-sub">Export to cloud after sessions</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div><div class="sr-label">Data Sharing</div><div class="sr-sub">Share anonymised data for research</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div><div class="sr-label">ML Predictions</div><div class="sr-sub">AI performance forecasting</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ATHLETE PERFORMANCE ── -->
+    <div class="page" id="page-athlete-perf">
+      <div id="athlete-perf-content"></div>
+    </div>
+
+    <!-- ── ATHLETE TRAINING ── -->
+    <div class="page" id="page-athlete-training">
+      <div id="athlete-training-content"></div>
+    </div>
+
+    <!-- ── ATHLETE PROGRESS ── -->
+    <div class="page" id="page-athlete-progress">
+      <div id="athlete-progress-content"></div>
+    </div>
+
+    <!-- ── ATHLETE PROFILE ── -->
+    <div class="page" id="page-athlete-profile">
+      <div id="athlete-profile-content"></div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<script>
+// ═══ DATA ═══
+const USERS = {
+  coach:   { pass:'pulse123', role:'Coach',   title:'Head Coach',   av:'C', color:'linear-gradient(135deg,#00f5ff,#0099ff)' },
+  analyst: { pass:'pulse123', role:'Analyst', title:'Data Analyst', av:'A', color:'linear-gradient(135deg,#a855f7,#6366f1)' },
+  athlete: { pass:'pulse123', role:'Athlete', title:'Forward #7',   av:'P', color:'linear-gradient(135deg,#ff4d00,#ff9000)' }
+};
+
+const PLAYERS = [
+  {name:'Arjun Kumar',   av:'AK', pos:'Forward',    score:94, speed:31.2, hr:148, cal:920, risk:'low',  riskV:18, color:'linear-gradient(135deg,#00f5ff,#0099ff)'},
+  {name:'Rohit Singh',   av:'RS', pos:'Midfielder', score:88, speed:29.1, hr:142, cal:860, risk:'med',  riskV:55, color:'linear-gradient(135deg,#ff4d00,#ff9000)'},
+  {name:'Priya Mehta',   av:'PM', pos:'Defender',   score:85, speed:27.4, hr:138, cal:810, risk:'low',  riskV:22, color:'linear-gradient(135deg,#ffd700,#ff8c00)'},
+  {name:'Dev Kapoor',    av:'DK', pos:'Goalkeeper', score:81, speed:24.2, hr:130, cal:740, risk:'hi',   riskV:78, color:'linear-gradient(135deg,#a855f7,#6366f1)'},
+  {name:'Neha Patel',    av:'NP', pos:'Forward',    score:79, speed:30.5, hr:145, cal:900, risk:'low',  riskV:15, color:'linear-gradient(135deg,#00ff88,#00cc66)'},
+  {name:'Sameer Rao',    av:'SR', pos:'Midfielder', score:76, speed:28.0, hr:140, cal:830, risk:'med',  riskV:60, color:'linear-gradient(135deg,#f472b6,#e11d48)'},
+  {name:'Kavya Sharma',  av:'KS', pos:'Forward',    score:91, speed:32.1, hr:150, cal:940, risk:'low',  riskV:10, color:'linear-gradient(135deg,#06b6d4,#0891b2)'},
+  {name:'Vikram Das',    av:'VD', pos:'Defender',   score:73, speed:25.8, hr:136, cal:770, risk:'hi',   riskV:82, color:'linear-gradient(135deg,#f97316,#ea580c)'},
+];
+
+const ACTIVITIES = [
+  {text:'Arjun Kumar reached peak speed of 31.2 km/h', time:'2 min ago', color:'var(--neon)'},
+  {text:'Dev Kapoor flagged HIGH injury risk — reduce load', time:'5 min ago', color:'var(--fire)'},
+  {text:'Session intensity 87% — above target baseline', time:'9 min ago', color:'var(--green)'},
+  {text:'Vikram Das fatigue index crossing 80%', time:'12 min ago', color:'var(--gold)'},
+  {text:'Post-session report auto-generated & saved', time:'18 min ago', color:'var(--neon)'},
+];
+
+const TRAINING_PLAN = [
+  {day:'Monday',    type:'Speed Training',    duration:'90 min', intensity:'High',   done:true},
+  {day:'Tuesday',   type:'Recovery & Yoga',   duration:'60 min', intensity:'Low',    done:true},
+  {day:'Wednesday', type:'Tactical Drills',   duration:'120 min',intensity:'Medium', done:true},
+  {day:'Thursday',  type:'Strength & Core',   duration:'75 min', intensity:'High',   done:false},
+  {day:'Friday',    type:'Match Simulation',  duration:'100 min',intensity:'High',   done:false},
+  {day:'Saturday',  type:'Shooting Practice', duration:'80 min', intensity:'Medium', done:false},
+  {day:'Sunday',    type:'Rest Day',          duration:'—',      intensity:'Rest',   done:false},
+];
+
+let currentRole = 'Coach';
+
+// ═══ LOGIN ═══
+function setRole(r) {
+  currentRole = r;
+  document.querySelectorAll('.role-tab').forEach((t,i)=>{
+    t.classList.toggle('active', ['Coach','Analyst','Athlete'][i]===r);
+  });
+}
+
+function doLogin() {
+  const u = document.getElementById('l-user').value.trim().toLowerCase();
+  const p = document.getElementById('l-pass').value.trim();
+  const err = document.getElementById('login-err');
+  const user = USERS[u];
+  if (user && user.pass === p) {
+    err.style.display='none';
+    launchApp(u, user);
+  } else {
+    err.style.display='block';
+    document.getElementById('l-pass').value='';
+  }
+}
+
+document.getElementById('l-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('l-user').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function launchApp(username, user) {
+  const lp = document.getElementById('login-page');
+  lp.classList.add('hide');
+  setTimeout(()=>{ lp.style.display='none'; }, 600);
+  document.getElementById('app').classList.add('show');
+  document.getElementById('sb-role').textContent = user.role;
+  document.getElementById('sb-role2').textContent = user.title;
+  document.getElementById('sb-name').textContent = username.charAt(0).toUpperCase()+username.slice(1);
+  document.getElementById('sb-av').textContent = user.av;
+  document.getElementById('sb-av').style.background = user.color;
+
+  const nav = document.querySelector('.sb-nav');
+
+  if (username === 'athlete') {
+    // Athlete: My Performance + Training + Progress + Profile + Settings
+    nav.innerHTML = `
+      <div class="sb-section-lbl">My Dashboard</div>
+      <div class="nav-item active" onclick="switchPage('athlete-perf',this)"><span class="ni-icon">📊</span> My Performance</div>
+      <div class="nav-item" onclick="switchPage('athlete-training',this)"><span class="ni-icon">⚡</span> Training</div>
+      <div class="nav-item" onclick="switchPage('athlete-progress',this)"><span class="ni-icon">📈</span> Progress</div>
+      <div class="nav-item" onclick="switchPage('athlete-profile',this)"><span class="ni-icon">👤</span> Profile</div>
+      <div class="sb-section-lbl">System</div>
+      <div class="nav-item" onclick="switchPage('settings',this)"><span class="ni-icon">⚙️</span> Settings</div>
+    `;
+    buildDashboard();
+    buildAthletePerf();
+    buildAthleteTraining();
+    buildAthleteProgress();
+    buildAthleteProfile();
+    // Activate athlete perf page
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-athlete-perf').classList.add('active');
+    document.getElementById('page-title').textContent = 'MY PERFORMANCE';
+  } else {
+    // Coach & Analyst: full nav + overview
+    nav.innerHTML = `
+      <div class="sb-section-lbl">Main</div>
+      <div class="nav-item active" onclick="switchPage('overview',this)"><span class="ni-icon">🏠</span> Overview</div>
+      <div class="nav-item" onclick="switchPage('athletes',this)"><span class="ni-icon">🏃</span> Athletes <span class="ni-badge">14</span></div>
+      <div class="nav-item" onclick="switchPage('analytics',this)"><span class="ni-icon">📊</span> Analytics</div>
+      <div class="sb-section-lbl">Management</div>
+      <div class="nav-item" onclick="switchPage('training',this)"><span class="ni-icon">⚡</span> Training</div>
+      <div class="nav-item" onclick="switchPage('injuries',this)"><span class="ni-icon">❤️</span> Injury Monitor <span class="ni-badge" style="background:var(--gold);color:var(--dark);">3</span></div>
+      <div class="sb-section-lbl">System</div>
+      <div class="nav-item" onclick="switchPage('settings',this)"><span class="ni-icon">⚙️</span> Settings</div>
+    `;
+    buildDashboard();
+    // Activate overview page
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-overview').classList.add('active');
+    document.getElementById('page-title').textContent = 'OVERVIEW';
+  }
+
+  startClock();
+  startLiveUpdates();
+}
+
+function doLogout() {
+  document.getElementById('app').classList.remove('show');
+  // Reset all pages to hidden, overview to active for next login
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-overview').classList.add('active');
+  const lp = document.getElementById('login-page');
+  lp.style.display='flex'; lp.classList.remove('hide');
+  document.getElementById('l-user').value='';
+  document.getElementById('l-pass').value='';
+  document.getElementById('page-title').textContent='OVERVIEW';
+}
+
+// ═══ NAVIGATION ═══
+function switchPage(name, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('page-title').textContent = name==='athlete-perf'?'MY PERFORMANCE':name==='athlete-training'?'TRAINING':name==='athlete-progress'?'PROGRESS':name==='athlete-profile'?'PROFILE':name.toUpperCase();
+  // Re-render charts when switching to these pages
+  if (name==='overview') { buildChart('main-chart',[65,80,55,90,70,85,95],['MON','TUE','WED','THU','FRI','SAT','SUN']); }
+  if (name==='analytics') { buildChart('analytics-chart',[70,88,60,95,75,82,90],['M','T','W','T','F','S','S']); buildHeatmap(); }
+  if (name==='athlete-perf') { setTimeout(()=>{ const s=document.getElementById('radarCanvas'); if(s){ drawRadar({SPEED:{val:84,grade:'A'},OFFENSE:{val:86,grade:'A'},DEFENSE:{val:68,grade:'C'},SHOOT:{val:82,grade:'A'},DRIBBLE:{val:95,grade:'S'},PASS:{val:88,grade:'A'}}); }}, 100); }
+  if (name==='athlete-training') { buildAthleteTraining(); }
+  if (name==='athlete-progress') { buildAthleteProgress(); }
+  if (name==='athlete-profile') { buildAthleteProfile(); }
+}
+
+// ═══ BUILD DASHBOARD ═══
+function buildDashboard() {
+  buildChart('main-chart', [65,80,55,90,70,85,95],['MON','TUE','WED','THU','FRI','SAT','SUN']);
+  buildTopTable();
+  buildActivityFeed();
+  buildAthletesGrid();
+  buildAnalyticsChart();
+  buildHeatmap();
+  buildTrainingPlan();
+  buildInjuryTable();
+}
+
+function buildChart(id, heights, labels) {
+  const el = document.getElementById(id); if(!el) return;
+  el.innerHTML='';
+  const colors = ['','b-fire','','b-gold','','b-green',''];
+  heights.forEach((h,i)=>{
+    const wrap=document.createElement('div'); wrap.className='c-bar-wrap';
+    const bar=document.createElement('div'); bar.className='c-bar '+(colors[i]||'');
+    bar.style.height='0px'; bar.style.flex='1';
+    const lbl=document.createElement('div'); lbl.className='c-lbl'; lbl.textContent=labels[i];
+    wrap.appendChild(bar); wrap.appendChild(lbl); el.appendChild(wrap);
+    setTimeout(()=>{ bar.style.height=h+'px'; }, 200+i*80);
+  });
+}
+
+function buildTopTable() {
+  const tb = document.getElementById('top-table'); if(!tb) return;
+  tb.innerHTML = PLAYERS.slice(0,5).map(p=>{
+    const riskColor = p.risk==='low'?'var(--green)':p.risk==='med'?'var(--gold)':'var(--fire)';
+    const sc = p.score>=85?'s-hi':p.score>=75?'s-md':'s-lo';
+    return `<tr>
+      <td style="display:flex;align-items:center;gap:10px">
+        <div class="p-av" style="background:${p.color}">${p.av}</div>
+        <div><div class="p-nm">${p.name}</div></div>
+      </td>
+      <td><span style="font-size:11px;letter-spacing:1px;color:rgba(184,204,216,0.45);text-transform:uppercase">${p.pos}</span></td>
+      <td><span class="score-pill ${sc}">${p.score}</span></td>
+      <td><span style="font-family:'JetBrains Mono';font-size:13px;color:var(--fire)">${p.speed}</span></td>
+      <td>
+        <div class="risk-bar-wrap">
+          <div class="risk-bar"><div class="risk-fill" style="width:${p.riskV}%;background:${riskColor}"></div></div>
+          <span style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:${riskColor}">${p.risk.toUpperCase()}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function buildActivityFeed() {
+  const af = document.getElementById('activity-feed'); if(!af) return;
+  af.innerHTML = ACTIVITIES.map(a=>`
+    <div class="af-item">
+      <div class="af-dot" style="background:${a.color}"></div>
+      <div class="af-content">
+        <div class="af-text">${a.text}</div>
+        <div class="af-time">${a.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+function buildAthletesGrid() {
+  const g = document.getElementById('athletes-grid'); if(!g) return;
+  g.innerHTML = PLAYERS.map(p=>{
+    const rt = p.risk==='low'?'low':p.risk==='med'?'med':'hi';
+    return `<div class="athlete-card">
+      <div class="ac-risk-tag ${rt}">${p.risk.toUpperCase()}</div>
+      <div class="ac-header">
+        <div class="ac-av" style="background:${p.color}">${p.av}</div>
+        <div>
+          <div class="ac-name">${p.name}</div>
+          <div class="ac-pos">${p.pos}</div>
+        </div>
+      </div>
+      <div class="ac-stats">
+        <div class="ac-stat"><div class="v" style="color:var(--neon)">${p.hr}</div><div class="l">BPM</div></div>
+        <div class="ac-stat"><div class="v" style="color:var(--fire)">${p.speed}</div><div class="l">km/h</div></div>
+        <div class="ac-stat"><div class="v" style="color:var(--gold)">${p.cal}</div><div class="l">kcal</div></div>
+      </div>
+      <div class="ac-score-bar"><div class="ac-score-fill" style="width:${p.score}%"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;">
+        <span style="font-size:11px;color:rgba(184,204,216,0.4);letter-spacing:1px">Performance</span>
+        <span style="font-family:'JetBrains Mono';font-size:12px;color:var(--neon)">${p.score}/100</span>
+      </div>
+    </div>`;
+  }).join('');
+  // filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+}
+
+function buildAnalyticsChart() {
+  buildChart('analytics-chart',[70,88,60,95,75,82,90],['M','T','W','T','F','S','S']);
+}
+
+function buildHeatmap() {
+  const hm = document.getElementById('heatmap'); if(!hm) return;
+  const intensities = Array.from({length:42},()=>Math.random());
+  const colors = ['rgba(0,245,255,', 'rgba(0,255,136,', 'rgba(255,215,0,', 'rgba(255,77,0,'];
+  hm.innerHTML = intensities.map(v=>{
+    let col, op=0.1+v*0.85;
+    if(v<0.25)      col='rgba(0,245,255,';
+    else if(v<0.5)  col='rgba(0,255,136,';
+    else if(v<0.75) col='rgba(255,215,0,';
+    else            col='rgba(255,77,0,';
+    return `<div class="hm-cell" style="background:${col}${op.toFixed(2)})" title="Load: ${Math.round(v*100)}%"></div>`;
+  }).join('');
+}
+
+function buildTrainingPlan() {
+  const tp = document.getElementById('training-plan'); if(!tp) return;
+  tp.innerHTML = TRAINING_PLAN.map(s=>{
+    const ic = s.intensity==='High'?'var(--fire)':s.intensity==='Low'?'var(--green)':s.intensity==='Rest'?'rgba(184,204,216,0.3)':'var(--gold)';
+    return `<div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(0,245,255,0.05)">
+      <div style="font-size:18px">${s.done?'✅':'⬜'}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px;color:${s.done?'rgba(184,204,216,0.4)':'var(--white)'};${s.done?'text-decoration:line-through':''}">${s.type}</div>
+        <div style="font-size:11px;color:rgba(184,204,216,0.35);margin-top:2px;letter-spacing:1px">${s.day} · ${s.duration}</div>
+      </div>
+      <span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${ic};background:rgba(255,255,255,0.04);padding:3px 10px">${s.intensity}</span>
+    </div>`;
+  }).join('');
+
+  const tc = document.getElementById('training-completion'); if(!tc) return;
+  const completedItems = ['Speed Work','Passing Drills','Recovery','Strength','Tactical Drills','Shooting'];
+  const vals = [90,78,100,65,82,55];
+  const cols = ['var(--neon)','var(--neon)','var(--green)','var(--gold)','var(--neon)','var(--fire)'];
+  tc.innerHTML = completedItems.map((it,i)=>`
+    <div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+        <span style="color:var(--text)">${it}</span>
+        <span style="font-family:'JetBrains Mono';font-size:12px;color:${cols[i]}">${vals[i]}%</span>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">
+        <div style="width:${vals[i]}%;height:100%;background:${cols[i]};border-radius:2px"></div>
+      </div>
+    </div>`).join('');
+}
+
+function buildInjuryTable() {
+  const it = document.getElementById('injury-table'); if(!it) return;
+  it.innerHTML = `<table class="ptable" style="width:100%">
+    <thead><tr>
+      <th>ATHLETE</th><th>POSITION</th><th>RISK LEVEL</th><th>WORKLOAD</th><th>FATIGUE INDEX</th><th>ACTION</th>
+    </tr></thead>
+    <tbody>${PLAYERS.map(p=>{
+      const rc = p.risk==='low'?'var(--green)':p.risk==='med'?'var(--gold)':'var(--fire)';
+      const fatigue = Math.round(p.riskV * 0.9 + Math.random()*10);
+      const workload = Math.round(60 + Math.random()*35);
+      return `<tr>
+        <td style="display:flex;align-items:center;gap:10px">
+          <div class="p-av" style="background:${p.color}">${p.av}</div>
+          <div class="p-nm">${p.name}</div>
+        </td>
+        <td><span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(184,204,216,0.45)">${p.pos}</span></td>
+        <td><span class="ac-risk-tag ${p.risk}" style="position:static;display:inline-block">${p.risk.toUpperCase()}</span></td>
+        <td>
+          <div class="risk-bar-wrap">
+            <div class="risk-bar" style="width:100px"><div class="risk-fill" style="width:${workload}%;background:var(--neon)"></div></div>
+            <span style="font-family:'JetBrains Mono';font-size:12px;color:var(--neon)">${workload}%</span>
+          </div>
+        </td>
+        <td>
+          <div class="risk-bar-wrap">
+            <div class="risk-bar" style="width:100px"><div class="risk-fill" style="width:${fatigue}%;background:${rc}"></div></div>
+            <span style="font-family:'JetBrains Mono';font-size:12px;color:${rc}">${fatigue}%</span>
+          </div>
+        </td>
+        <td><button onclick="alert('Rest protocol assigned to ${p.name}')" style="padding:5px 14px;background:rgba(0,245,255,0.07);border:1px solid rgba(0,245,255,0.2);color:var(--neon);font-family:'Rajdhani';font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(0,245,255,0.15)'" onmouseout="this.style.background='rgba(0,245,255,0.07)'">ASSIGN REST</button></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+// ═══ LIVE UPDATES ═══
+function startLiveUpdates() {
+  setInterval(()=>{
+    const k1 = document.getElementById('k1');
+    const k2 = document.getElementById('k2');
+    const k4 = document.getElementById('k4');
+    if(k1) k1.textContent = 130 + Math.floor(Math.random()*35);
+    if(k2) k2.textContent = (27 + Math.random()*5).toFixed(1);
+    if(k4) k4.textContent = (80+Math.floor(Math.random()*15))+'%';
+  }, 2500);
+}
+
+// ═══ CLOCK ═══
+function startClock() {
+  const cl = document.getElementById('clock');
+  function tick() {
+    const now = new Date();
+    const h=String(now.getHours()).padStart(2,'0');
+    const m=String(now.getMinutes()).padStart(2,'0');
+    const s=String(now.getSeconds()).padStart(2,'0');
+    if(cl) cl.textContent = `${h}:${m}:${s}`;
+  }
+  tick(); setInterval(tick, 1000);
+}
+
+// ═══ ATHLETE PERFORMANCE PAGE ═══
+function buildAthletePerf() {
+  const ATHLETE = {
+    name: 'Arjun Kumar', av: 'AK', pos: 'Forward', number: 7,
+    total: 86, grade: 'A',
+    stats: {
+      SPEED:   { val: 84, grade: 'A' },
+      OFFENSE: { val: 86, grade: 'A' },
+      DEFENSE: { val: 68, grade: 'C' },
+      SHOOT:   { val: 82, grade: 'A' },
+      DRIBBLE: { val: 95, grade: 'S' },
+      PASS:    { val: 88, grade: 'A' }
+    },
+    hr: 148, speed: 31.2, cal: 920, risk: 'LOW',
+    sessions: 24, goals: 12, assists: 8
+  };
+
+  const grades = ['G','F','E','D','C','B','A','S'];
+  const gradeColors = {S:'#00f5ff',A:'#00ff88',B:'#ffd700',C:'#ffd700',D:'#ff9000',E:'#ff4d00',F:'#ff0040',G:'#888'};
+
+  const container = document.getElementById('athlete-perf-content');
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start;max-width:1100px;">
+
+      <!-- LEFT: Player Card -->
+      <div>
+        <!-- ID Card -->
+        <div style="background:var(--card);border:1px solid var(--border2);padding:28px;margin-bottom:20px;position:relative;overflow:hidden;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%)">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--neon),var(--fire),var(--gold))"></div>
+          <div style="display:flex;align-items:center;gap:18px;margin-bottom:20px;">
+            <div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#00f5ff,#0099ff);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:28px;color:#060b14;border:2px solid rgba(0,245,255,0.4);flex-shrink:0">AK</div>
+            <div>
+              <div style="font-family:'Bebas Neue';font-size:26px;letter-spacing:3px;color:#f0f8ff;line-height:1">${ATHLETE.name}</div>
+              <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(0,245,255,0.6);margin-top:4px">${ATHLETE.pos} · #${ATHLETE.number}</div>
+              <div style="margin-top:8px;display:inline-block;background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.3);padding:2px 10px;font-size:10px;letter-spacing:3px;color:#00ff88">LOW RISK</div>
+            </div>
+          </div>
+          <!-- Total score -->
+          <div style="display:flex;align-items:center;gap:0;background:rgba(0,245,255,0.04);border:1px solid var(--border);padding:16px 20px;margin-bottom:16px;">
+            <div style="flex:1">
+              <div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(184,204,216,0.4);margin-bottom:4px">Comprehensive Total</div>
+              <div style="font-family:'Bebas Neue';font-size:52px;color:#f0f8ff;line-height:1">${ATHLETE.total}</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(184,204,216,0.4);margin-bottom:4px">Grade</div>
+              <div style="font-family:'Bebas Neue';font-size:72px;color:${gradeColors[ATHLETE.grade]};line-height:1;text-shadow:0 0 30px ${gradeColors[ATHLETE.grade]}60">${ATHLETE.grade}</div>
+            </div>
+          </div>
+          <!-- Grade scale -->
+          <div style="margin-bottom:16px;">
+            <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(184,204,216,0.35);margin-bottom:8px">Grade Scale</div>
+            <div style="display:flex;gap:4px;">
+              ${grades.map(g=>`<div style="flex:1;text-align:center;padding:4px 2px;font-family:'JetBrains Mono';font-size:11px;font-weight:700;color:${gradeColors[g]};background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);${g===ATHLETE.grade?'border-color:'+gradeColors[g]+';background:'+gradeColors[g]+'18':'}'}">${g}</div>`).join('')}
+            </div>
+            <div style="display:flex;gap:4px;margin-top:4px;">
+              ${[['S','90-100'],['A','80-89'],['B','70-79'],['C','60-69'],['D','50-59'],['E','40-49'],['F','30-39'],['G','0-29']].map(([g,r])=>`<div style="flex:1;text-align:center;font-size:8px;color:rgba(184,204,216,0.25);font-family:'JetBrains Mono'">${r}</div>`).join('')}
+            </div>
+          </div>
+          <!-- Quick stats -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+            <div style="text-align:center;background:rgba(0,245,255,0.04);border:1px solid var(--border);padding:10px 6px;">
+              <div style="font-family:'Bebas Neue';font-size:24px;color:#00f5ff;line-height:1">${ATHLETE.hr}</div>
+              <div style="font-size:9px;letter-spacing:2px;color:rgba(184,204,216,0.4);text-transform:uppercase">BPM</div>
+            </div>
+            <div style="text-align:center;background:rgba(255,77,0,0.04);border:1px solid rgba(255,77,0,0.12);padding:10px 6px;">
+              <div style="font-family:'Bebas Neue';font-size:24px;color:#ff4d00;line-height:1">${ATHLETE.speed}</div>
+              <div style="font-size:9px;letter-spacing:2px;color:rgba(184,204,216,0.4);text-transform:uppercase">KM/H</div>
+            </div>
+            <div style="text-align:center;background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.12);padding:10px 6px;">
+              <div style="font-family:'Bebas Neue';font-size:24px;color:#ffd700;line-height:1">${ATHLETE.cal}</div>
+              <div style="font-size:9px;letter-spacing:2px;color:rgba(184,204,216,0.4);text-transform:uppercase">KCAL</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stat breakdown -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:24px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)">
+          <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:3px;color:rgba(0,245,255,0.6);text-transform:uppercase;margin-bottom:16px">STAT BREAKDOWN</div>
+          ${Object.entries(ATHLETE.stats).map(([k,v])=>`
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+              <div style="font-family:'Bebas Neue';font-size:13px;letter-spacing:2px;color:${gradeColors[v.grade]};width:60px">${k}</div>
+              <div style="flex:1;height:5px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+                <div class="radar-bar-anim" style="height:100%;width:0%;background:linear-gradient(90deg,${gradeColors[v.grade]},${gradeColors[v.grade]}66);border-radius:2px;transition:width 1.4s cubic-bezier(.23,1,.32,1)" data-w="${v.val}%"></div>
+              </div>
+              <div style="font-family:'JetBrains Mono';font-size:13px;color:#f0f8ff;width:28px;text-align:right">${v.val}</div>
+              <div style="font-family:'Bebas Neue';font-size:16px;color:${gradeColors[v.grade]};width:16px;text-align:center">${v.grade}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- RIGHT: Radar Chart -->
+      <div>
+        <div style="background:var(--card);border:1px solid var(--border2);padding:32px;position:relative;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,0 100%)">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--neon),transparent)"></div>
+          <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:3px;color:rgba(0,245,255,0.6);text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:8px;">
+            <span class="live-dot2"></span> COMPREHENSIVE PERFORMANCE RADAR
+          </div>
+          <div style="display:flex;justify-content:center;">
+            <canvas id="radarCanvas" width="460" height="460" style="max-width:100%;height:auto;display:block"></canvas>
+          </div>
+        </div>
+
+        <!-- Session stats -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px;">
+          <div style="background:var(--card);border:1px solid var(--border);padding:20px;text-align:center;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)">
+            <div style="font-family:'Bebas Neue';font-size:44px;color:#00f5ff;line-height:1">${ATHLETE.sessions}</div>
+            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(184,204,216,0.4);margin-top:4px">Sessions</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);padding:20px;text-align:center;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)">
+            <div style="font-family:'Bebas Neue';font-size:44px;color:#ff4d00;line-height:1">${ATHLETE.goals}</div>
+            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(184,204,216,0.4);margin-top:4px">Goals</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);padding:20px;text-align:center;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)">
+            <div style="font-family:'Bebas Neue';font-size:44px;color:#ffd700;line-height:1">${ATHLETE.assists}</div>
+            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(184,204,216,0.4);margin-top:4px">Assists</div>
+          </div>
+        </div>
+
+        <!-- Weekly trend mini chart -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:24px;margin-top:16px;">
+          <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:3px;color:rgba(0,245,255,0.6);text-transform:uppercase;margin-bottom:16px">WEEKLY PERFORMANCE TREND</div>
+          <div style="display:flex;align-items:flex-end;gap:10px;height:80px;" id="trend-chart"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Animate stat bars
+  setTimeout(()=>{
+    document.querySelectorAll('.radar-bar-anim').forEach(b=>{ b.style.width = b.dataset.w; });
+  }, 200);
+
+  // Build trend chart
+  const tc = document.getElementById('trend-chart');
+  const tVals = [72,78,74,82,80,86,84];
+  const tLabels = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  const tColors = ['b-fire','','b-fire','','b-gold','b-green','b-green'];
+  tVals.forEach((v,i)=>{
+    const w = document.createElement('div');
+    w.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;gap:4px';
+    const b = document.createElement('div');
+    b.style.cssText=`width:100%;border-radius:2px 2px 0 0;min-height:4px;transition:height 1.2s cubic-bezier(.23,1,.32,1);background:linear-gradient(180deg,${i===5?'#00ff88':i===3||i===6?'#ffd700':'#00f5ff'},rgba(0,0,0,0.1));height:0px;`;
+    const l = document.createElement('div');
+    l.style.cssText='font-size:9px;font-family:JetBrains Mono,monospace;color:rgba(184,204,216,0.35)';
+    l.textContent = tLabels[i];
+    w.appendChild(b); w.appendChild(l); tc.appendChild(w);
+    setTimeout(()=>{ b.style.height=(v-65)+'px'; }, 300+i*80);
+  });
+
+  // Draw radar chart
+  setTimeout(()=>{ drawRadar(ATHLETE.stats); }, 100);
+}
+
+function drawRadar(stats) {
+  const canvas = document.getElementById('radarCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+  const R = 170; // outer ring radius
+  const keys = ['SPEED','OFFENSE','DEFENSE','SHOOT','DRIBBLE','PASS'];
+  const N = keys.length;
+  const angleStep = (Math.PI*2)/N;
+  const startAngle = -Math.PI/2;
+
+  const statColors = {SPEED:'#00f5ff',OFFENSE:'#00ff88',DEFENSE:'#ffd700',SHOOT:'#ff4d00',DRIBBLE:'#a855f7',PASS:'#00f5ff'};
+  const gradeColors2 = {S:'#00f5ff',A:'#00ff88',B:'#ffd700',C:'#ffd700',D:'#ff9000',E:'#ff4d00',F:'#ff0040',G:'#888'};
+
+  ctx.clearRect(0,0,W,H);
+
+  // Concentric rings (6 levels)
+  for (let r=1; r<=6; r++) {
+    ctx.beginPath();
+    for (let i=0;i<N;i++) {
+      const a = startAngle + i*angleStep;
+      const pr = (R/6)*r;
+      const x=cx+Math.cos(a)*pr, y=cy+Math.sin(a)*pr;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = r===6?'rgba(0,245,255,0.25)':'rgba(0,245,255,0.08)';
+    ctx.lineWidth = r===6?1.5:1;
+    ctx.stroke();
+    // ring label
+    if(r>0) {
+      ctx.fillStyle='rgba(184,204,216,0.2)';
+      ctx.font='bold 9px JetBrains Mono,monospace';
+      ctx.textAlign='center';
+      ctx.fillText(String(r*100/6|0), cx+4, cy-(R/6)*r+4);
+    }
+  }
+
+  // Spokes
+  for (let i=0;i<N;i++) {
+    const a=startAngle+i*angleStep;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(a)*R, cy+Math.sin(a)*R);
+    ctx.strokeStyle='rgba(0,245,255,0.12)';
+    ctx.lineWidth=1;
+    ctx.stroke();
+  }
+
+  // Filled radar polygon (animated via steps)
+  const vals = keys.map(k=>stats[k].val/100);
+  let step=0, totalSteps=60;
+  function animFrame() {
+    ctx.clearRect(0,0,W,H);
+    // Redraw rings
+    for (let r=1;r<=6;r++) {
+      ctx.beginPath();
+      for (let i=0;i<N;i++) {
+        const a=startAngle+i*angleStep, pr=(R/6)*r;
+        const x=cx+Math.cos(a)*pr, y=cy+Math.sin(a)*pr;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle=r===6?'rgba(0,245,255,0.25)':'rgba(0,245,255,0.08)';
+      ctx.lineWidth=r===6?1.5:1; ctx.stroke();
+    }
+    for (let i=0;i<N;i++) {
+      const a=startAngle+i*angleStep;
+      ctx.beginPath(); ctx.moveTo(cx,cy);
+      ctx.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);
+      ctx.strokeStyle='rgba(0,245,255,0.12)'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    const progress=Math.min(step/totalSteps,1);
+    const ease=1-Math.pow(1-progress,3);
+
+    // Glow polygon fill
+    ctx.beginPath();
+    keys.forEach((k,i)=>{
+      const a=startAngle+i*angleStep;
+      const dist=vals[i]*R*ease;
+      const x=cx+Math.cos(a)*dist, y=cy+Math.sin(a)*dist;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.closePath();
+    const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+    grad.addColorStop(0,'rgba(0,245,255,0.25)');
+    grad.addColorStop(0.5,'rgba(0,255,136,0.12)');
+    grad.addColorStop(1,'rgba(168,85,247,0.08)');
+    ctx.fillStyle=grad; ctx.fill();
+    ctx.strokeStyle='rgba(0,245,255,0.8)'; ctx.lineWidth=2;
+    ctx.shadowColor='#00f5ff'; ctx.shadowBlur=12; ctx.stroke();
+    ctx.shadowBlur=0;
+
+    // Vertex dots
+    keys.forEach((k,i)=>{
+      const a=startAngle+i*angleStep;
+      const dist=vals[i]*R*ease;
+      const x=cx+Math.cos(a)*dist, y=cy+Math.sin(a)*dist;
+      ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2);
+      ctx.fillStyle=statColors[k]; ctx.shadowColor=statColors[k]; ctx.shadowBlur=14;
+      ctx.fill(); ctx.shadowBlur=0;
+    });
+
+    // Labels (always full size)
+    const labelR=R+36;
+    keys.forEach((k,i)=>{
+      const a=startAngle+i*angleStep;
+      const lx=cx+Math.cos(a)*labelR, ly=cy+Math.sin(a)*labelR;
+      // stat name
+      ctx.font='bold 13px Bebas Neue,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle=statColors[k];
+      ctx.shadowColor=statColors[k]; ctx.shadowBlur=8;
+      ctx.fillText(k, lx, ly-8); ctx.shadowBlur=0;
+      // grade
+      const grade=stats[k].grade;
+      ctx.font='bold 16px Bebas Neue,sans-serif';
+      ctx.fillStyle=gradeColors2[grade];
+      ctx.shadowColor=gradeColors2[grade]; ctx.shadowBlur=10;
+      ctx.fillText(grade, lx, ly+10); ctx.shadowBlur=0;
+      // value
+      ctx.font='bold 10px JetBrains Mono,monospace';
+      ctx.fillStyle='rgba(184,204,216,0.5)';
+      ctx.fillText(stats[k].val, lx, ly+26);
+    });
+
+    // Center total
+    ctx.font='bold 11px JetBrains Mono,monospace';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(0,245,255,0.5)';
+    ctx.fillText('TOTAL', cx, cy-18);
+    ctx.font='bold 36px Bebas Neue,sans-serif';
+    ctx.fillStyle='#f0f8ff';
+    ctx.shadowColor='rgba(0,245,255,0.4)'; ctx.shadowBlur=20;
+    ctx.fillText('86', cx, cy+4); ctx.shadowBlur=0;
+    ctx.font='bold 20px Bebas Neue,sans-serif';
+    ctx.fillStyle='#00ff88';
+    ctx.shadowColor='#00ff88'; ctx.shadowBlur=12;
+    ctx.fillText('A', cx, cy+26); ctx.shadowBlur=0;
+
+    step++;
+    if(step<=totalSteps) requestAnimationFrame(animFrame);
+  }
+  requestAnimationFrame(animFrame);
+}
+// ═══ ATHLETE — TRAINING PAGE ═══
+function buildAthleteTraining() {
+  const c = document.getElementById('athlete-training-content'); if(!c) return;
+
+  const MY_PLAN = [
+    {day:'Monday',    type:'Speed & Sprint Intervals',  duration:'90 min',  intensity:'High',   done:true,  note:'Focus on explosive starts'},
+    {day:'Tuesday',   type:'Recovery & Mobility',       duration:'60 min',  intensity:'Low',    done:true,  note:'Foam roll + yoga'},
+    {day:'Wednesday', type:'Tactical Drills',           duration:'120 min', intensity:'Medium', done:true,  note:'Pressing & positioning'},
+    {day:'Thursday',  type:'Strength & Core',           duration:'75 min',  intensity:'High',   done:false, note:'Gym session — legs & core'},
+    {day:'Friday',    type:'Match Simulation',          duration:'100 min', intensity:'High',   done:false, note:'Full 11v11 scrimmage'},
+    {day:'Saturday',  type:'Shooting Practice',         duration:'80 min',  intensity:'Medium', done:false, note:'Finishing from crosses'},
+    {day:'Sunday',    type:'Rest Day',                  duration:'—',       intensity:'Rest',   done:false, note:'Active recovery only'},
+  ];
+
+  const upcoming = [
+    {title:'Pre-Season Fitness Test', date:'Mar 14', type:'Assessment', color:'var(--neon)'},
+    {title:'Friendly vs FC United',   date:'Mar 18', type:'Match',      color:'var(--fire)'},
+    {title:'Video Analysis Session',  date:'Mar 20', type:'Tactical',   color:'var(--gold)'},
+  ];
+
+  const ic = s => s==='High'?'var(--fire)':s==='Low'?'var(--green)':s==='Rest'?'rgba(184,204,216,0.3)':'var(--gold)';
+  const done3 = MY_PLAN.filter(d=>d.done).length;
+
+  c.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;">
+
+      <!-- Left: weekly plan -->
+      <div>
+        <div style="background:var(--card);border:1px solid var(--border2);padding:28px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%);margin-bottom:20px;">
+          <div style="position:absolute;display:none"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;">⚡ WEEKLY TRAINING PLAN</div>
+            <div style="font-size:12px;font-family:'JetBrains Mono';color:var(--green)">${done3}/7 COMPLETE</div>
+          </div>
+          <!-- Progress bar -->
+          <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-bottom:24px;">
+            <div style="width:${Math.round(done3/7*100)}%;height:100%;background:linear-gradient(90deg,var(--green),var(--neon));border-radius:2px;transition:width 1.2s"></div>
+          </div>
+          ${MY_PLAN.map(s=>`
+          <div onclick="this.querySelector('.session-note').style.display=this.querySelector('.session-note').style.display==='none'?'block':'none'"
+               style="display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid rgba(0,245,255,0.05);cursor:pointer;transition:background 0.2s;"
+               onmouseover="this.style.background='rgba(0,245,255,0.025)'" onmouseout="this.style.background=''">
+            <div style="font-size:20px;flex-shrink:0">${s.done?'✅':'⬜'}</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:15px;color:${s.done?'rgba(184,204,216,0.4)':'var(--white)'};${s.done?'text-decoration:line-through':''}">${s.type}</div>
+              <div style="font-size:11px;color:rgba(184,204,216,0.35);margin-top:2px;letter-spacing:1px">${s.day} · ${s.duration}</div>
+              <div class="session-note" style="display:none;margin-top:6px;font-size:12px;color:rgba(0,245,255,0.5);letter-spacing:1px">📌 ${s.note}</div>
+            </div>
+            <span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${ic(s.intensity)};background:rgba(255,255,255,0.04);padding:3px 10px;flex-shrink:0">${s.intensity}</span>
+          </div>`).join('')}
+        </div>
+
+        <!-- Today's session detail -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:28px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%)">
+          <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;margin-bottom:20px;">TODAY'S SESSION — STRENGTH & CORE</div>
+          ${[
+            {ex:'Squats',          sets:'4×12', load:'80kg',  rest:'90s', color:'var(--neon)'},
+            {ex:'Romanian Deadlift',sets:'3×10',load:'70kg',  rest:'90s', color:'var(--neon)'},
+            {ex:'Plank Hold',      sets:'3×60s',load:'BW',   rest:'45s', color:'var(--gold)'},
+            {ex:'Box Jumps',       sets:'4×8',  load:'BW',   rest:'60s', color:'var(--fire)'},
+            {ex:'Cable Rotations', sets:'3×15', load:'15kg',  rest:'45s', color:'var(--green)'},
+          ].map(ex=>`
+          <div style="display:flex;align-items:center;gap:16px;padding:11px 0;border-bottom:1px solid rgba(0,245,255,0.04);">
+            <div style="width:6px;height:6px;border-radius:50%;background:${ex.color};flex-shrink:0;box-shadow:0 0 8px ${ex.color}"></div>
+            <div style="flex:1;font-size:14px;font-weight:600;color:var(--white)">${ex.ex}</div>
+            <div style="font-family:'JetBrains Mono';font-size:12px;color:var(--neon);min-width:60px">${ex.sets}</div>
+            <div style="font-family:'JetBrains Mono';font-size:12px;color:var(--gold);min-width:40px">${ex.load}</div>
+            <div style="font-size:11px;color:rgba(184,204,216,0.35);letter-spacing:1px">REST ${ex.rest}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Right: sidebar -->
+      <div>
+        <!-- Upcoming events -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:24px;margin-bottom:18px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)">
+          <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;margin-bottom:18px;">UPCOMING</div>
+          ${upcoming.map(u=>`
+          <div style="display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid rgba(0,245,255,0.05);">
+            <div style="text-align:center;background:rgba(255,255,255,0.04);border:1px solid ${u.color}40;padding:6px 10px;min-width:48px;">
+              <div style="font-family:'Bebas Neue';font-size:18px;color:${u.color};line-height:1">${u.date.split(' ')[1]}</div>
+              <div style="font-size:9px;color:rgba(184,204,216,0.35);letter-spacing:2px">${u.date.split(' ')[0].toUpperCase()}</div>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--white)">${u.title}</div>
+              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:${u.color};margin-top:3px">${u.type}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+
+        <!-- Load metrics -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:24px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)">
+          <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;margin-bottom:18px;">THIS WEEK'S LOAD</div>
+          ${[
+            {label:'Training Volume', val:78, color:'var(--neon)'},
+            {label:'Intensity Score', val:82, color:'var(--fire)'},
+            {label:'Recovery Index',  val:91, color:'var(--green)'},
+            {label:'Readiness',       val:86, color:'var(--gold)'},
+          ].map(m=>`
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+              <span style="color:var(--text)">${m.label}</span>
+              <span style="font-family:'JetBrains Mono';font-size:12px;color:${m.color}">${m.val}%</span>
+            </div>
+            <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+              <div style="width:${m.val}%;height:100%;background:${m.color};border-radius:2px;"></div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ═══ ATHLETE — PROGRESS PAGE ═══
+function buildAthleteProgress() {
+  const c = document.getElementById('athlete-progress-content'); if(!c) return;
+
+  const months = ['OCT','NOV','DEC','JAN','FEB','MAR'];
+  const overallScores = [74, 77, 79, 82, 84, 86];
+  const statHistory = {
+    SPEED:   [72,74,77,80,82,84],
+    OFFENSE: [75,77,79,82,84,86],
+    DEFENSE: [55,58,60,63,65,68],
+    SHOOT:   [70,72,74,77,79,82],
+    DRIBBLE: [85,87,89,91,93,95],
+    PASS:    [78,80,82,84,86,88],
+  };
+  const statColors2 = {SPEED:'#00f5ff',OFFENSE:'#00ff88',DEFENSE:'#ffd700',SHOOT:'#ff4d00',DRIBBLE:'#a855f7',PASS:'#00c8ff'};
+
+  const achievements = [
+    {icon:'🏆', title:'Speed Demon',      desc:'Reached 32+ km/h in training',     date:'Feb 2025', color:'var(--gold)'},
+    {icon:'⚡', title:'Century Club',     desc:'100 training sessions completed',  date:'Jan 2025', color:'var(--neon)'},
+    {icon:'🎯', title:'Sharpshooter',     desc:'87% shooting accuracy this month', date:'Mar 2025', color:'var(--fire)'},
+    {icon:'💪', title:'Iron Consistency', desc:'21-day no-miss training streak',   date:'Dec 2024', color:'var(--green)'},
+  ];
+
+  const maxScore = Math.max(...overallScores);
+  const chartH = 120;
+
+  c.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;">
+
+      <!-- Left -->
+      <div>
+        <!-- Overall score trend -->
+        <div style="background:var(--card);border:1px solid var(--border2);padding:28px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%);margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+            <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;display:flex;align-items:center;gap:8px;"><span class="live-dot2"></span> OVERALL SCORE — 6 MONTHS</div>
+            <div style="font-family:'Bebas Neue';font-size:26px;color:var(--green)">▲ +12 pts</div>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:12px;height:${chartH}px;" id="progress-chart-main">
+            ${overallScores.map((v,i)=>{
+              const h = Math.round((v/100)*chartH);
+              const isLast = i===overallScores.length-1;
+              return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;">
+                <div style="font-family:'JetBrains Mono';font-size:10px;color:${isLast?'var(--green)':'rgba(184,204,216,0.4)'}">${v}</div>
+                <div style="width:100%;border-radius:2px 2px 0 0;background:${isLast?'linear-gradient(180deg,var(--green),rgba(0,255,136,0.2))':'linear-gradient(180deg,var(--neon),rgba(0,245,255,0.15))'};height:${h}px;transition:height 1.2s"></div>
+                <div style="font-size:9px;font-family:'JetBrains Mono';color:rgba(184,204,216,0.35)">${months[i]}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Per-stat progression -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:28px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%);margin-bottom:20px;">
+          <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;margin-bottom:22px;">STAT PROGRESSION — 6 MONTHS</div>
+          ${Object.entries(statHistory).map(([k,vals])=>{
+            const diff = vals[vals.length-1]-vals[0];
+            return `<div style="margin-bottom:18px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span style="font-family:'Bebas Neue';font-size:14px;letter-spacing:2px;color:${statColors2[k]}">${k}</span>
+                <div style="display:flex;align-items:center;gap:18px;">
+                  <div style="display:flex;gap:3px;align-items:flex-end;height:28px;">
+                    ${vals.map((v,i)=>{
+                      const h=Math.round(((v-50)/50)*28);
+                      return `<div style="width:8px;height:${h}px;background:${statColors2[k]};opacity:${0.3+i*0.12};border-radius:1px 1px 0 0"></div>`;
+                    }).join('')}
+                  </div>
+                  <span style="font-family:'JetBrains Mono';font-size:12px;color:${diff>0?'var(--green)':'var(--fire)'};">${diff>0?'+':''}${diff}</span>
+                  <span style="font-family:'Bebas Neue';font-size:22px;color:var(--white)">${vals[vals.length-1]}</span>
+                </div>
+              </div>
+              <div style="height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;">
+                <div style="width:${vals[vals.length-1]}%;height:100%;background:${statColors2[k]};border-radius:2px;"></div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div>
+        <!-- Grade history -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:24px;margin-bottom:18px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)">
+          <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;margin-bottom:18px;">GRADE HISTORY</div>
+          ${[['OCT','C'],['NOV','C'],['DEC','B'],['JAN','B'],['FEB','B'],['MAR','A']].map(([m,g])=>{
+            const gc={S:'#00f5ff',A:'#00ff88',B:'#ffd700',C:'#ffd700',D:'#ff9000'}[g];
+            return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(0,245,255,0.05);">
+              <span style="font-size:12px;letter-spacing:2px;color:rgba(184,204,216,0.5)">${m} 2024${m==='MAR'?' (Current)':''}</span>
+              <span style="font-family:'Bebas Neue';font-size:22px;color:${gc};text-shadow:0 0 12px ${gc}60">${g}</span>
+            </div>`;
+          }).join('')}
+        </div>
+
+        <!-- Achievements -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:24px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)">
+          <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;margin-bottom:18px;">ACHIEVEMENTS</div>
+          ${achievements.map(a=>`
+          <div style="display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid rgba(0,245,255,0.05);">
+            <div style="font-size:24px;flex-shrink:0">${a.icon}</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:14px;color:${a.color}">${a.title}</div>
+              <div style="font-size:11px;color:rgba(184,204,216,0.45);margin-top:2px">${a.desc}</div>
+              <div style="font-size:10px;letter-spacing:2px;color:rgba(184,204,216,0.25);margin-top:3px">${a.date}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ═══ ATHLETE — PROFILE PAGE ═══
+function buildAthleteProfile() {
+  const c = document.getElementById('athlete-profile-content'); if(!c) return;
+  c.innerHTML = `
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start;">
+
+      <!-- Left: avatar & bio -->
+      <div>
+        <div style="background:var(--card);border:1px solid var(--border2);padding:28px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%);margin-bottom:20px;text-align:center;">
+          <div style="position:relative;display:inline-block;margin-bottom:18px;">
+            <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#00f5ff,#0099ff);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:36px;color:#060b14;border:3px solid rgba(0,245,255,0.4);margin:0 auto;">AK</div>
+            <div style="position:absolute;bottom:2px;right:2px;width:16px;height:16px;border-radius:50%;background:var(--green);border:2px solid var(--darker)"></div>
+          </div>
+          <div style="font-family:'Bebas Neue';font-size:28px;letter-spacing:3px;color:var(--white)">Arjun Kumar</div>
+          <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(0,245,255,0.6);margin-top:4px">Forward · #7</div>
+          <div style="margin:14px auto 0;display:inline-block;background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.3);padding:3px 14px;font-size:10px;letter-spacing:3px;color:var(--green)">ACTIVE</div>
+          <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+            <div style="background:rgba(0,245,255,0.04);border:1px solid var(--border);padding:10px 4px;text-align:center;">
+              <div style="font-family:'Bebas Neue';font-size:22px;color:var(--neon);line-height:1">24</div>
+              <div style="font-size:9px;letter-spacing:2px;color:rgba(184,204,216,0.4)">SESSIONS</div>
+            </div>
+            <div style="background:rgba(255,77,0,0.04);border:1px solid rgba(255,77,0,0.12);padding:10px 4px;text-align:center;">
+              <div style="font-family:'Bebas Neue';font-size:22px;color:var(--fire);line-height:1">12</div>
+              <div style="font-size:9px;letter-spacing:2px;color:rgba(184,204,216,0.4)">GOALS</div>
+            </div>
+            <div style="background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.12);padding:10px 4px;text-align:center;">
+              <div style="font-family:'Bebas Neue';font-size:22px;color:var(--gold);line-height:1">8</div>
+              <div style="font-size:9px;letter-spacing:2px;color:rgba(184,204,216,0.4)">ASSISTS</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact info -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:24px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)">
+          <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;margin-bottom:16px;">CONTACT</div>
+          ${[
+            {icon:'📧', label:'Email',  val:'arjun@sporteval.io'},
+            {icon:'📱', label:'Phone',  val:'+91 98765 43210'},
+            {icon:'📍', label:'City',   val:'Mumbai, India'},
+            {icon:'🎂', label:'DOB',    val:'15 Aug 2001 (23 yrs)'},
+          ].map(r=>`
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,245,255,0.04);">
+            <span style="font-size:16px">${r.icon}</span>
+            <div>
+              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(184,204,216,0.35)">${r.label}</div>
+              <div style="font-size:13px;color:var(--white);margin-top:2px">${r.val}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Right: editable form + physical stats -->
+      <div>
+        <!-- Edit profile form -->
+        <div style="background:var(--card);border:1px solid var(--border2);padding:28px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%);margin-bottom:20px;">
+          <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;margin-bottom:22px;">EDIT PROFILE</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            ${[
+              {label:'Full Name',    val:'Arjun Kumar',     type:'text'},
+              {label:'Jersey No.',   val:'7',               type:'text'},
+              {label:'Position',     val:'Forward',         type:'text'},
+              {label:'Nationality',  val:'India',           type:'text'},
+              {label:'Height (cm)',  val:'176',             type:'number'},
+              {label:'Weight (kg)',  val:'72',              type:'number'},
+              {label:'Preferred Foot', val:'Right',         type:'text'},
+              {label:'Contract End', val:'2026-06-30',      type:'date'},
+            ].map(f=>`
+            <div>
+              <label style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(0,245,255,0.6);margin-bottom:7px;display:block">${f.label}</label>
+              <input type="${f.type}" value="${f.val}" style="width:100%;padding:11px 14px;background:rgba(0,245,255,0.03);border:1px solid var(--border);color:var(--white);font-family:'Rajdhani';font-size:14px;outline:none;transition:border-color 0.3s"
+                     onfocus="this.style.borderColor='rgba(0,245,255,0.5)'" onblur="this.style.borderColor='rgba(0,245,255,0.12)'">
+            </div>`).join('')}
+          </div>
+          <button onclick="athleteProfileSave()" style="margin-top:20px;padding:13px 32px;background:linear-gradient(135deg,var(--neon),var(--neon2));color:var(--dark);font-family:'Rajdhani';font-weight:700;font-size:14px;letter-spacing:3px;text-transform:uppercase;border:none;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);transition:transform 0.2s,box-shadow 0.3s"
+                  onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 30px rgba(0,245,255,0.35)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            SAVE PROFILE
+          </button>
+          <span id="athlete-profile-ok" style="display:none;margin-left:14px;color:var(--green);font-size:12px;font-family:'JetBrains Mono';letter-spacing:2px">✓ SAVED</span>
+        </div>
+
+        <!-- Physical benchmarks -->
+        <div style="background:var(--card);border:1px solid var(--border);padding:28px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%)">
+          <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:3px;color:rgba(0,245,255,0.65);text-transform:uppercase;margin-bottom:22px;">PHYSICAL BENCHMARKS</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;">
+            ${[
+              {label:'40m Sprint',  val:'4.82s', sub:'Top 15%',  color:'var(--neon)'},
+              {label:'VO₂ Max',     val:'62.4',  sub:'Excellent', color:'var(--green)'},
+              {label:'Peak Speed',  val:'32.1',  sub:'km/h',      color:'var(--fire)'},
+              {label:'Jump Height', val:'68cm',  sub:'Above avg', color:'var(--gold)'},
+            ].map(b=>`
+            <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:16px 12px;text-align:center;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)">
+              <div style="font-family:'Bebas Neue';font-size:30px;color:${b.color};line-height:1">${b.val}</div>
+              <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(184,204,216,0.4);margin-top:4px">${b.label}</div>
+              <div style="font-size:10px;color:${b.color};margin-top:3px;letter-spacing:1px">${b.sub}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function athleteProfileSave() {
+  const ok = document.getElementById('athlete-profile-ok');
+  ok.style.display='inline';
+  setTimeout(()=>{ ok.style.display='none'; }, 3000);
+}
+
+function saveProfile() {
+
+  const ok = document.getElementById('save-ok');
+  ok.style.display='block';
+  const n = document.getElementById('s-name').value;
+  document.getElementById('sb-name').textContent = n.split(' ').slice(-1)[0];
+  setTimeout(()=>{ ok.style.display='none'; }, 3000);
+}
+</script>
+</body>
+</html>
